@@ -1,8 +1,10 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useBlogPosts } from '../hooks/useBlogPosts';
 
 export default function Home() {
+  const { posts } = useBlogPosts();
   return (
     <div>
       {/* Hero Section */}
@@ -52,24 +54,36 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Latest Posts</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <article key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
-                <img
-                  src={`https://images.unsplash.com/photo-151336477614${i}-60967b0f800f?auto=format&fit=crop&q=80`}
-                  alt={`Blog post ${i}`}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">Blog Post Title {i}</h3>
-                  <p className="text-gray-600 mb-4">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  </p>
-                  <Link
-                    to={`/blog/post-${i}`}
-                    className="text-indigo-600 hover:text-indigo-700 font-medium"
-                  >
-                    Read more →
-                  </Link>
+            {posts.slice(0, 3).map((post, idx) => (
+              <article key={post.id || idx} className="bg-white rounded-lg overflow-hidden shadow-sm">
+                {post.imageUrl && (
+                  <img
+                    src={post.imageUrl}
+                    alt={post.description || 'Blog image'}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                <div className="p-6 flex flex-col justify-between">
+                  <div>
+                    <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
+                      {post.date ? new Date(post.date).toLocaleDateString() : ''}
+                    </div>
+                    <div className="block mt-1 text-lg leading-tight font-medium text-black">
+                      {post.description || 'No description'}
+                    </div>
+                  </div>
+                  {post.url && (
+                    <div className="mt-4">
+                      <a
+                        href={post.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-700 font-medium"
+                      >
+                        Read more →
+                      </a>
+                    </div>
+                  )}
                 </div>
               </article>
             ))}

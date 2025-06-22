@@ -8,11 +8,11 @@ export interface Artwork {
 }
 
 export interface BlogPost {
-  id: string;
-  title: string;
-  content: string;
-  imageUrl: string;
-  createdAt: string;
+  id?: string;
+  description?: string;
+  imageUrl?: string;
+  date?: string;
+  url?: string;
 }
 
 export interface SocialLink {

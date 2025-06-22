@@ -1,44 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useArtworks } from '../hooks/useArtworks';
 import ArtworkModal from '../components/ArtworkModal';
 import { Artwork } from '../types';
 
 const categories = ['All', 'Paintings', 'Sculptures', 'Digital Art'];
 
-const sampleArtworks: Artwork[] = [
-  {
-    id: '1',
-    title: 'Abstract Harmony',
-    description: 'An exploration of color and form through abstract expressionism.',
-    imageUrl: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80',
-    category: 'Paintings',
-    createdAt: '2024-01-15',
-  },
-  {
-    id: '1',
-    title: 'll',
-    description: 'An exploration of color and form through abstract expressionism.',
-    imageUrl: 'https://plus.unsplash.com/premium_photo-1706430433607-48f37bdd71b8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    category: 'Sculptures',
-    createdAt: '2024-01-15',
-  },
-  {
-    id: '1',
-    title: 'Abstract Harmony',
-    description: 'An exploration of color and form through abstract expressionism.',
-    imageUrl: 'https://images.unsplash.com/photo-1494253109108-2e30c049369b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    category: 'Digital Art',
-    createdAt: '2024-01-15',
-  },
-  // Add more sample artworks here
-];
-
 export default function Gallery() {
+  const { artworks } = useArtworks();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
 
   const filteredArtworks = selectedCategory === 'All'
-    ? sampleArtworks
-    : sampleArtworks.filter(artwork => artwork.category === selectedCategory);
+    ? artworks
+    : artworks.filter(artwork => artwork.category === selectedCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
