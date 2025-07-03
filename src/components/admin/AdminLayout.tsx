@@ -5,9 +5,9 @@ import { useAuth } from '../../hooks/useAuth';
 export default function AdminLayout() {
   const { isAuthenticated } = useAuth();
 
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/admin/login" replace />;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { supabase } from '../supabaseClient';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -9,8 +10,10 @@ interface AuthState {
 export const useAuth = create<AuthState>((set) => ({
   isAuthenticated: false,
   login: async (email: string, password: string) => {
-    // In a real app, implement actual authentication
-    if (email === 'admin@example.com' && password === 'password') {
+    // Check against Supabase users table (or fallback to static for now)
+    // Example: const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // For now, fallback to static credentials
+    if (email === 'admin@example.com' && password === 'password123') {
       set({ isAuthenticated: true });
     } else {
       throw new Error('Invalid credentials');
@@ -18,3 +21,5 @@ export const useAuth = create<AuthState>((set) => ({
   },
   logout: () => set({ isAuthenticated: false }),
 }));
+
+

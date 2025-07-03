@@ -10,6 +10,7 @@ import AdminDashboard from '../pages/admin/Dashboard';
 import AdminGallery from '../pages/admin/Gallery';
 import AdminBlog from '../pages/admin/Blog';
 import LoginForm from '../components/admin/LoginForm';
+import AdminMessages from '../pages/admin/Messages';
 
 export const router = createBrowserRouter([
   {
@@ -24,13 +25,17 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    path: '/admin/login',
+    element: <LoginForm />,
+  },
+  {
     path: '/admin',
     element: <AdminLayout />,
     children: [
       { index: true, element: <AdminDashboard /> },
-      { path: 'login', element: <LoginForm /> },
       { path: 'gallery', element: <AdminGallery /> },
       { path: 'blog', element: <AdminBlog /> },
+      { path: 'messages', element: <AdminMessages /> },
     ],
   },
 ]);

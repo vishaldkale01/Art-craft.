@@ -1,21 +1,42 @@
 import { create } from 'zustand';
+import { supabase } from '../supabaseClient';
 
 interface ContactState {
   address: string;
   phone: string;
   email: string;
   studioHours: string[];
-  setContact: (data: { address: string; phone: string; email: string; studioHours: string[] }) => void;
+  fetchContact: () => Promise<void>;
+  setContact: (data: { address: string; phone: string; email: string; studioHours: string[] }) => Promise<void>;
 }
 
 export const useContact = create<ContactState>((set) => ({
-  address: '123 Artist Studio, Creative District, City',
-  phone: '+1 (555) 123-4567',
-  email: 'artist@example.com',
-  studioHours: [
-    'Monday - Friday: 10:00 AM - 6:00 PM',
-    'Saturday: By Appointment',
-    'Sunday: Closed',
-  ],
-  setContact: (data) => set(data),
+  address: '',
+  phone: '',
+  email: '',
+  studioHours: [],
+  fetchContact: async () => {
+    const { data, error } = await supabase.from('contact').select('*').single();
+    if (!error && data) set({
+      address: data.address || '',
+      phone: data.phone || '',
+      email: data.email || '',
+      studioHours: data.studio_hours || [],
+    });
+  },
+  setContact: async (data) => {
+    await supabase.from('contact').upsert({
+      id: 1,
+      address: data.address,
+      phone: data.phone,
+      email: data.email,
+      studio_hours: data.studioHours,
+    });
+    set({
+      address: data.address,
+      phone: data.phone,
+      email: data.email,
+      studioHours: data.studioHours,
+    });
+  },
 }));

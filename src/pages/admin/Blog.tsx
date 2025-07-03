@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import BlogPostForm from '../../components/admin/BlogPostForm';
 
 export default function AdminBlog() {
-  const { posts, addPost, updatePost, deletePost } = useBlogPosts();
+  const { posts, fetchPosts, addPost, updatePost, deletePost } = useBlogPosts();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   return (
     <div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useMessages } from '../hooks/useMessages';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -9,8 +10,11 @@ export default function ContactForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
+    // Save message to store
+    useMessages.getState().addMessage(formData);
+    setFormData({ name: '', email: '', message: '' });
+    // Optionally show a success message
+    alert('Message sent!');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

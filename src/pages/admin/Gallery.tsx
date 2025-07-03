@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { useArtworks } from '../../hooks/useArtworks';
+import { useGalleryCategories } from '../../hooks/useGalleryCategories';
 import ArtworkForm from '../../components/admin/ArtworkForm';
 
 export default function AdminGallery() {
-  const { artworks, addArtwork, updateArtwork, deleteArtwork } = useArtworks();
+  const { artworks, fetchArtworks, addArtwork, updateArtwork, deleteArtwork } = useArtworks();
+  const { categories, fetchCategories, addCategory, deleteCategory } = useGalleryCategories();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingArtwork, setEditingArtwork] = useState<any>(null);
+  const [newCategory, setNewCategory] = useState('');
+
+  useEffect(() => {
+    fetchArtworks();
+    fetchCategories();
+  }, []);
 
   return (
     <div>
@@ -57,6 +65,46 @@ export default function AdminGallery() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold mb-2">Manage Categories</h2>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {categories.map((cat) => (
+            <span key={cat} className="inline-flex items-center bg-gray-100 rounded px-3 py-1 text-sm font-medium">
+              {cat}
+              <button
+                onClick={() => deleteCategory(cat)}
+                className="ml-2 text-red-500 hover:text-red-700"
+                title="Delete category"
+                disabled={artworks.some(a => a.category === cat)}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            if (newCategory.trim()) {
+              addCategory(newCategory.trim());
+              setNewCategory('');
+            }
+          }}
+          className="flex gap-2"
+        >
+          <input
+            type="text"
+            value={newCategory}
+            onChange={e => setNewCategory(e.target.value)}
+            placeholder="Add new category"
+            className="border rounded px-2 py-1 text-sm"
+          />
+          <button type="submit" className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">
+            Add
+          </button>
+        </form>
       </div>
 
       {isFormOpen && (

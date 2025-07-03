@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from './Modal';
 import FormField from './FormField';
 import { Artwork } from '../../types';
+import { useGalleryCategories } from '../../hooks/useGalleryCategories';
+import { supabase } from '../../supabaseClient';
 
 interface ArtworkFormProps {
   artwork?: Artwork;
@@ -10,21 +12,46 @@ interface ArtworkFormProps {
 }
 
 export default function ArtworkForm({ artwork, onSubmit, onClose }: ArtworkFormProps) {
+  const { categories, fetchCategories } = useGalleryCategories();
   const [formData, setFormData] = useState({
     title: artwork?.title || '',
     description: artwork?.description || '',
     imageUrl: artwork?.imageUrl || '',
     category: artwork?.category || '',
   });
+  const [filePreview, setFilePreview] = useState<string | null>(artwork?.imageUrl || null);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'imageUrl') {
+      setFilePreview(value);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const { data, error } = await supabase.storage.from('artwork-images').upload(fileName, file);
+      if (!error && data) {
+        // Get public URL
+        const { data: urlData } = supabase.storage.from('artwork-images').getPublicUrl(fileName);
+        setFormData(prev => ({ ...prev, imageUrl: urlData.publicUrl }));
+        setFilePreview(urlData.publicUrl);
+      }
+    }
   };
 
   return (
@@ -45,13 +72,26 @@ export default function ArtworkForm({ artwork, onSubmit, onClose }: ArtworkFormP
           multiline
           required
         />
-        <FormField
-          label="Image URL"
-          name="imageUrl"
-          value={formData.imageUrl}
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <FormField
+            label="Image URL"
+            name="imageUrl"
+            value={formData.imageUrl}
+            onChange={handleChange}
+            placeholder="Paste image link or upload below"
+          />
+          <div className="mt-2 flex items-center gap-4">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="block"
+            />
+            {filePreview && (
+              <img src={filePreview} alt="Preview" className="h-16 w-16 object-cover rounded" />
+            )}
+          </div>
+        </div>
         <FormField
           label="Category"
           name="category"
@@ -59,7 +99,7 @@ export default function ArtworkForm({ artwork, onSubmit, onClose }: ArtworkFormP
           onChange={handleChange}
           required
           asDropdown
-          options={['Paintings', 'Sculptures', 'Digital Art']}
+          options={categories}
         />
         <div className="flex justify-end space-x-4">
           <button

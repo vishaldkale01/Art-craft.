@@ -1,24 +1,43 @@
 import { create } from 'zustand';
+import { supabase } from '../supabaseClient';
 
 interface AboutState {
   aboutText: string;
   education: string[];
   exhibitions: string[];
   imageUrl: string;
-  setAbout: (data: { aboutText: string; education: string[]; exhibitions: string[]; imageUrl: string }) => void;
+  fetchAbout: () => Promise<void>;
+  setAbout: (data: { aboutText: string; education: string[]; exhibitions: string[]; imageUrl: string }) => Promise<void>;
 }
 
 export const useAbout = create<AboutState>((set) => ({
-  aboutText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  education: [
-    'Master of Fine Arts, University Name, Year',
-    'Bachelor of Arts, University Name, Year',
-  ],
-  exhibitions: [
-    'Solo Exhibition, Gallery Name, City, Year',
-    'Group Exhibition, Gallery Name, City, Year',
-    'Art Fair, Event Name, City, Year',
-  ],
-  imageUrl: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80',
-  setAbout: (data) => set(data),
+  aboutText: '',
+  education: [],
+  exhibitions: [],
+  imageUrl: '',
+  fetchAbout: async () => {
+    const { data, error } = await supabase.from('about').select('*').single();
+    if (!error && data) set({
+      aboutText: data.about_text || '',
+      education: data.education || [],
+      exhibitions: data.exhibitions || [],
+      imageUrl: data.image_url || '',
+    });
+  },
+  setAbout: async (data) => {
+    // Upsert single row (id=1)
+    await supabase.from('about').upsert({
+      id: 1,
+      about_text: data.aboutText,
+      education: data.education,
+      exhibitions: data.exhibitions,
+      image_url: data.imageUrl,
+    });
+    set({
+      aboutText: data.aboutText,
+      education: data.education,
+      exhibitions: data.exhibitions,
+      imageUrl: data.imageUrl,
+    });
+  },
 }));

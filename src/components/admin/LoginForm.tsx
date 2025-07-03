@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import FormField from './FormField';
 
@@ -36,6 +36,9 @@ export default function LoginForm() {
           <h2 className="text-center text-3xl font-bold text-gray-900">
             Admin Login
           </h2>
+        </div>
+        <div className="text-center mb-4">
+          <Link to="/" className="text-indigo-600 hover:underline text-sm">← Back to Home</Link>
         </div>
         {error && (
           <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm">

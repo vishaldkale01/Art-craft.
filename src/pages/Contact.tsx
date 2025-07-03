@@ -1,9 +1,15 @@
+import { useEffect } from 'react';
 import { useContact } from '../hooks/useContact';
 import ContactForm from '../components/ContactForm';
 import { MapPin, Phone, Mail } from 'lucide-react';
 
 export default function Contact() {
-  const { address, phone, email, studioHours } = useContact();
+  const { address, phone, email, studioHours, fetchContact } = useContact();
+
+  useEffect(() => {
+    fetchContact();
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-4xl font-bold text-gray-900 mb-8">Contact</h1>

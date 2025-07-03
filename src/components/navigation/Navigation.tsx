@@ -8,6 +8,7 @@ const routes = [
   { path: '/blog', label: 'Blog' },
   { path: '/about', label: 'About' },
   { path: '/contact', label: 'Contact' },
+  { path: '/admin/login', label: 'Admin Login' },
 ];
 
 export default function Navigation() {

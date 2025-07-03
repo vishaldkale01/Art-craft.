@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useArtworks } from '../hooks/useArtworks';
 import ArtworkModal from '../components/ArtworkModal';
 import { Artwork } from '../types';
@@ -6,9 +6,13 @@ import { Artwork } from '../types';
 const categories = ['All', 'Paintings', 'Sculptures', 'Digital Art'];
 
 export default function Gallery() {
-  const { artworks } = useArtworks();
+  const { artworks, fetchArtworks } = useArtworks();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
+
+  useEffect(() => {
+    fetchArtworks();
+  }, []);
 
   const filteredArtworks = selectedCategory === 'All'
     ? artworks

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, FileText, User, Mail } from 'lucide-react';
+import { Image, FileText, User, Mail, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAbout } from '../../hooks/useAbout';
 import { useContact } from '../../hooks/useContact';
@@ -60,6 +60,16 @@ export default function AdminDashboard() {
             <p className="text-gray-500">Edit contact information</p>
           </div>
         </button>
+        <Link
+          to="/admin/messages"
+          className="p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow flex items-center w-full text-left"
+        >
+          <MessageCircle className="h-8 w-8 text-indigo-600" />
+          <div className="ml-4">
+            <h2 className="text-lg font-medium">Manage Messages</h2>
+            <p className="text-gray-500">View contact form messages</p>
+          </div>
+        </Link>
       </div>
       {isAboutOpen && (
         <AboutForm

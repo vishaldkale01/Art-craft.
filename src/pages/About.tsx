@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAbout } from '../hooks/useAbout';
 
 export default function About() {
-  const { aboutText, education, exhibitions, imageUrl } = useAbout();
+  const { aboutText, education, exhibitions, imageUrl, fetchAbout } = useAbout();
+  useEffect(() => {
+    fetchAbout();
+  }, []);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="lg:flex lg:items-center lg:gap-x-12">
