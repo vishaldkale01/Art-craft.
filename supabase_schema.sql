@@ -1,6 +1,7 @@
 -- BlogPosts table
 create table if not exists blog_posts (
   id uuid primary key default gen_random_uuid(),
+  title text, -- Added title column
   description text,
   image_url text,
   date date,

@@ -24,7 +24,7 @@ export default function ArtworkModal({ artwork, onClose }: ArtworkModalProps) {
           <img
             src={artwork.imageUrl}
             alt={artwork.title}
-            className="w-full h-auto rounded-lg"
+            className="h-32 w-44 object-cover rounded mx-auto"
           />
           <div className="mt-4">
             <p className="text-gray-600">{artwork.description}</p>

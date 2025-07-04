@@ -18,7 +18,7 @@ export default function GallerySlider() {
         <img
           src={current.imageUrl}
           alt={current.title}
-          className="w-full h-80 object-cover object-center"
+          className="h-32 w-44 object-cover rounded mx-auto"
         />
         <button
           onClick={prev}

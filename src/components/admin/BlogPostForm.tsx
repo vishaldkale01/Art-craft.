@@ -66,68 +66,135 @@ export default function BlogPostForm({ post, onSubmit, onClose }: BlogPostFormPr
   };
 
   return (
-    <Modal title={post ? 'Edit Post' : 'New Post'} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <FormField
-          label="Description"
+<Modal title={post ? 'Edit Post' : 'New Post'} onClose={onClose}>
+  <form onSubmit={handleSubmit} className="flex flex-col max-h-[80vh]">
+    
+    {/* Scrollable Fields */}
+    <div className="overflow-y-auto pr-1 space-y-6 flex-1">
+      
+      {/* Title */}
+      <div>
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+        <input
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="Enter post title"
+          className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+
+      {/* Description */}
+      <div>
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea
+          id="description"
           name="description"
           value={formData.description}
           onChange={handleChange}
-          multiline
           rows={3}
+          className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="Write a short description..."
         />
-        <div>
-          <FormField
-            label="Image URL"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleChange}
-            placeholder="Paste image link or upload below"
-          />
-          <div className="mt-2 flex items-center gap-4">
+      </div>
+
+      {/* Image URL + Upload */}
+      <div>
+        <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+        <input
+          type="text"
+          name="imageUrl"
+          value={formData.imageUrl}
+          onChange={handleChange}
+          className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="Paste image link or upload below"
+        />
+
+        {/* Image Preview */}
+        <div className="mt-4 flex flex-col items-center gap-4">
+          <div className="relative w-full max-w-md aspect-video bg-gray-50 border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            {filePreview ? (
+              <img
+                src={filePreview}
+                alt="Preview"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://via.placeholder.com/384x216?text=No+Image';
+                }}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-lg font-medium bg-white bg-opacity-80">
+                No Image Selected
+              </div>
+            )}
+          </div>
+
+          <label className="inline-block cursor-pointer px-5 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 transition-colors font-medium">
+            {uploading ? 'Uploading...' : 'Choose Image'}
             <input
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="block"
+              className="hidden"
               disabled={uploading}
             />
-            {filePreview && (
-              <img src={filePreview} alt="Preview" className="h-16 w-16 object-cover rounded" onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/64?text=No+Image'; }} />
-            )}
-            {uploading && <span className="text-sm text-gray-500">Uploading...</span>}
-            {uploadError && <span className="text-sm text-red-500">{uploadError}</span>}
-          </div>
+          </label>
+
+          {uploadError && (
+            <span className="text-sm text-red-500">{uploadError}</span>
+          )}
+          {formData.imageUrl && (
+            <span className="text-xs text-gray-500 break-all max-w-xs text-center">{formData.imageUrl}</span>
+          )}
         </div>
-        <FormField
-          label="Date"
+      </div>
+
+      {/* Date */}
+      <div>
+        <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+        <input
+          type="date"
           name="date"
           value={formData.date}
           onChange={handleChange}
+          className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <FormField
-          label="External Link (Read more URL)"
+      </div>
+
+      {/* External URL */}
+      <div>
+        <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">External Link (Read more URL)</label>
+        <input
+          type="url"
           name="url"
           value={formData.url}
           onChange={handleChange}
+          className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="https://example.com/article"
         />
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-gray-700 hover:text-gray-900"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            disabled={uploading}
-          >
-            {post ? 'Update' : 'Create'}
-          </button>
-        </div>
-      </form>
-    </Modal>
+      </div>
+    </div>
+
+    {/* Sticky Footer Buttons */}
+    <div className="flex justify-end space-x-4 pt-4 border-t mt-4 bg-white sticky bottom-0 py-3 z-10">
+      <button
+        type="button"
+        onClick={onClose}
+        className="px-4 py-2 text-gray-600 hover:text-gray-900 transition"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        disabled={uploading}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+      >
+        {post ? 'Update' : 'Create'}
+      </button>
+    </div>
+  </form>
+</Modal>
+
   );
 }

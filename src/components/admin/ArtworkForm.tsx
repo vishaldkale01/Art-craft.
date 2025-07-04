@@ -71,83 +71,130 @@ export default function ArtworkForm({ artwork, onSubmit, onClose }: ArtworkFormP
   };
 
   return (
-    <Modal title={artwork ? 'Edit Artwork' : 'Add Artwork'} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="space-y-6">
+<Modal title={artwork ? 'Edit Artwork' : 'Add Artwork'} onClose={onClose}>
+  <form onSubmit={handleSubmit} className="flex flex-col max-h-[80vh]">
+
+    {/* Scrollable Fields */}
+    <div className="overflow-y-auto pr-1 space-y-6 flex-1">
+
+      {/* Title */}
+      <FormField
+        label="Title"
+        name="title"
+        value={formData.title}
+        onChange={handleChange}
+        className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+
+      {/* Description */}
+      <FormField
+        label="Description"
+        name="description"
+        value={formData.description}
+        onChange={handleChange}
+        multiline
+        className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+
+      {/* Image URL & Upload */}
+      <div>
         <FormField
-          label="Title"
-          name="title"
-          value={formData.title}
+          label="Image URL"
+          name="imageUrl"
+          value={formData.imageUrl}
           onChange={handleChange}
-          required
+          placeholder="Paste image link or upload below"
+          className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <FormField
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          multiline
-          required
-        />
-        <div>
-          <FormField
-            label="Image URL"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleChange}
-            placeholder="Paste image link or upload below"
-          />
-          <div className="mt-2 flex items-center gap-4">
+
+        {/* Image Preview */}
+        <div className="mt-4 flex flex-col items-center gap-4">
+          <div className="relative w-full max-w-md aspect-[3/4] bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            {filePreview ? (
+              <img
+                src={filePreview}
+                alt={formData.title || 'Artwork preview'}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://via.placeholder.com/384x512?text=No+Image';
+                }}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-lg font-medium bg-white bg-opacity-80">
+                No Image Selected
+              </div>
+            )}
+          </div>
+
+          <label className="inline-block cursor-pointer px-5 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 transition-colors font-medium">
+            {uploading ? 'Uploading...' : 'Choose Image'}
             <input
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="block"
+              className="hidden"
               disabled={uploading}
             />
-            {filePreview && (
-              <img src={filePreview} alt={formData.title || 'Artwork preview'} className="h-16 w-16 object-cover rounded" onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/64?text=No+Image'; }} />
-            )}
-            {uploading && <span className="text-sm text-gray-500">Uploading...</span>}
-            {uploadError && <span className="text-sm text-red-500">{uploadError}</span>}
-          </div>
+          </label>
+
+          {uploadError && (
+            <span className="text-sm text-red-500">{uploadError}</span>
+          )}
+
+          {formData.imageUrl && (
+            <span className="text-xs text-gray-500 break-all max-w-xs text-center">
+              {formData.imageUrl}
+            </span>
+          )}
         </div>
-        <FormField
-          label="Category"
-          name="category"
-          value={formData.category}
+      </div>
+
+      {/* Category Dropdown */}
+      <FormField
+        label="Category"
+        name="category"
+        value={formData.category}
+        onChange={handleChange}
+        asDropdown
+        options={categories}
+        className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+
+      {/* Featured Checkbox */}
+      <div className="flex items-center pt-1">
+        <input
+          type="checkbox"
+          id="featured"
+          name="featured"
+          checked={formData.featured}
           onChange={handleChange}
-          required
-          asDropdown
-          options={categories}
+          className="h-4 w-4 text-indigo-600 border-gray-300 rounded mr-2 focus:ring-indigo-500"
         />
-        <div className="flex items-center mt-2">
-          <input
-            type="checkbox"
-            id="featured"
-            name="featured"
-            checked={formData.featured}
-            onChange={handleChange}
-            className="mr-2"
-          />
-          <label htmlFor="featured" className="text-sm">Featured</label>
-        </div>
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-gray-700 hover:text-gray-900"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            disabled={uploading}
-          >
-            {artwork ? 'Update' : 'Create'}
-          </button>
-        </div>
-      </form>
-    </Modal>
+        <label htmlFor="featured" className="text-sm text-gray-700">
+          Featured
+        </label>
+      </div>
+    </div>
+
+    {/* Sticky Footer Buttons */}
+    <div className="flex justify-end space-x-4 pt-4 border-t mt-4 bg-white sticky bottom-0 py-3 z-10">
+      <button
+        type="button"
+        onClick={onClose}
+        className="px-4 py-2 text-gray-600 hover:text-gray-900 transition"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        disabled={uploading}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+      >
+        {artwork ? 'Update' : 'Create'}
+      </button>
+    </div>
+  </form>
+</Modal>
+
   );
 }

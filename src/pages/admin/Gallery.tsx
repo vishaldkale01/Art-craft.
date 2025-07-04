@@ -38,7 +38,7 @@ export default function AdminGallery() {
             <img
               src={artwork.imageUrl}
               alt={artwork.title}
-              className="w-full h-48 object-cover"
+              className="h-32 w-44 object-cover rounded mx-auto"
             />
             <div className="p-4">
               <h3 className="text-lg font-medium">{artwork.title}</h3>
