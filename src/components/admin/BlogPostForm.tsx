@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Modal from './Modal';
 import FormField from './FormField';
+import { supabase } from '../../supabaseClient';
 
 interface BlogPostFormProps {
   post?: {
@@ -21,6 +22,8 @@ export default function BlogPostForm({ post, onSubmit, onClose }: BlogPostFormPr
     url: post?.url || '',
   });
   const [filePreview, setFilePreview] = useState<string | null>(post?.imageUrl || null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Update preview if editing and imageUrl changes (for edit mode)
   // This effect ensures preview updates if the post changes (edit mode)
@@ -28,8 +31,9 @@ export default function BlogPostForm({ post, onSubmit, onClose }: BlogPostFormPr
     setFilePreview(formData.imageUrl || null);
   }, [formData.imageUrl]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (uploading) return; // Prevent submit while uploading
     onSubmit(formData);
   };
 
@@ -41,15 +45,23 @@ export default function BlogPostForm({ post, onSubmit, onClose }: BlogPostFormPr
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    debugger
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
-        setFilePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setUploading(true);
+      setUploadError(null);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const { data, error } = await supabase.storage.from('chashmish').upload(fileName, file, { upsert: true });
+      if (!error && data) {
+        const { data: urlData } = supabase.storage.from('chashmish').getPublicUrl(fileName);
+        setFormData(prev => ({ ...prev, imageUrl: urlData.publicUrl }));
+        setFilePreview(urlData.publicUrl);
+      } else {
+        setUploadError(error?.message || 'Unknown upload error');
+      }
+      setUploading(false);
     }
   };
 
@@ -78,10 +90,13 @@ export default function BlogPostForm({ post, onSubmit, onClose }: BlogPostFormPr
               accept="image/*"
               onChange={handleFileChange}
               className="block"
+              disabled={uploading}
             />
             {filePreview && (
-              <img src={filePreview} alt="Preview" className="h-16 w-16 object-cover rounded" />
+              <img src={filePreview} alt="Preview" className="h-16 w-16 object-cover rounded" onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/64?text=No+Image'; }} />
             )}
+            {uploading && <span className="text-sm text-gray-500">Uploading...</span>}
+            {uploadError && <span className="text-sm text-red-500">{uploadError}</span>}
           </div>
         </div>
         <FormField
@@ -107,6 +122,7 @@ export default function BlogPostForm({ post, onSubmit, onClose }: BlogPostFormPr
           <button
             type="submit"
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            disabled={uploading}
           >
             {post ? 'Update' : 'Create'}
           </button>

@@ -5,6 +5,7 @@ export interface Artwork {
   imageUrl: string;
   category: string;
   createdAt: string;
+  featured?: boolean; // Added for featured works
 }
 
 export interface BlogPost {

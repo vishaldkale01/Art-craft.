@@ -17,25 +17,62 @@ export const useBlogPosts = create<BlogPostsState>((set) => ({
       .from('blog_posts')
       .select('*')
       .order('date', { ascending: false });
-    if (!error) set({ posts: data || [] });
+    if (!error && data) {
+      // Map snake_case to camelCase
+      const mapped = data.map((p: any) => ({
+        id: p.id,
+        description: p.description,
+        imageUrl: p.image_url,
+        date: p.date,
+        url: p.url,
+      }));
+      set({ posts: mapped });
+    }
   },
   addPost: async (post) => {
+    // Map camelCase to snake_case for Supabase
+    const dbPost = { ...post };
+    if (post.imageUrl !== undefined) {
+      dbPost.image_url = post.imageUrl;
+      delete dbPost.imageUrl;
+    }
     const { data, error } = await supabase
       .from('blog_posts')
-      .insert([{ ...post }])
+      .insert([dbPost])
       .select();
     if (!error && data)
-      set((state) => ({ posts: [data[0], ...state.posts] }));
+      set((state) => ({
+        posts: [
+          {
+            ...data[0],
+            imageUrl: data[0].image_url,
+          },
+          ...state.posts,
+        ],
+      }));
   },
   updatePost: async (id, post) => {
+    // Map camelCase to snake_case for Supabase
+    const dbPost: any = { ...post };
+    if (post.imageUrl !== undefined) {
+      dbPost.image_url = post.imageUrl;
+      delete dbPost.imageUrl;
+    }
     const { data, error } = await supabase
       .from('blog_posts')
-      .update(post)
+      .update(dbPost)
       .eq('id', id)
       .select();
     if (!error && data)
       set((state) => ({
-        posts: state.posts.map((p) => (p.id === id ? data[0] : p)),
+        posts: state.posts.map((p) =>
+          p.id === id
+            ? {
+                ...data[0],
+                imageUrl: data[0].image_url,
+              }
+            : p
+        ),
       }));
   },
   deletePost: async (id) => {

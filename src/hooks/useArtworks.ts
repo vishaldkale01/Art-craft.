@@ -26,27 +26,68 @@ export const useArtworks = create<ArtworksState>((set) => ({
         imageUrl: a.image_url,
         category: a.category,
         createdAt: a.created_at,
+        featured: a.featured ?? false,
       }));
       set({ artworks: mapped });
     }
   },
   addArtwork: async (artwork) => {
+    // Map camelCase to snake_case for Supabase
+    const dbArtwork = {
+      title: artwork.title,
+      description: artwork.description,
+      image_url: artwork.imageUrl,
+      category: artwork.category,
+      featured: artwork.featured ?? false,
+    };
     const { data, error } = await supabase
       .from('artworks')
-      .insert([{ ...artwork }])
+      .insert([dbArtwork])
       .select();
-    if (!error && data)
-      set((state) => ({ artworks: [data[0], ...state.artworks] }));
+    if (!error && data) {
+      // Map result to camelCase
+      const mapped = {
+        id: data[0].id,
+        title: data[0].title,
+        description: data[0].description,
+        imageUrl: data[0].image_url,
+        category: data[0].category,
+        createdAt: data[0].created_at,
+        featured: data[0].featured ?? false,
+      };
+      set((state) => ({ artworks: [mapped, ...state.artworks] }));
+    }
   },
   updateArtwork: async (id, artwork) => {
+    // Map camelCase to snake_case for Supabase
+    const dbArtwork: any = { ...artwork };
+    if (artwork.imageUrl !== undefined) {
+      dbArtwork.image_url = artwork.imageUrl;
+      delete dbArtwork.imageUrl;
+    }
+    if (artwork.featured !== undefined) {
+      dbArtwork.featured = artwork.featured;
+    }
     const { data, error } = await supabase
       .from('artworks')
-      .update(artwork)
+      .update(dbArtwork)
       .eq('id', id)
       .select();
     if (!error && data)
       set((state) => ({
-        artworks: state.artworks.map((a) => (a.id === id ? data[0] : a)),
+        artworks: state.artworks.map((a) =>
+          a.id === id
+            ? {
+                id: data[0].id,
+                title: data[0].title,
+                description: data[0].description,
+                imageUrl: data[0].image_url,
+                category: data[0].category,
+                createdAt: data[0].created_at,
+                featured: data[0].featured ?? false,
+              }
+            : a
+        ),
       }));
   },
   deleteArtwork: async (id) => {
