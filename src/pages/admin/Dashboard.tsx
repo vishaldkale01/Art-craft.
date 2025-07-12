@@ -15,6 +15,7 @@ export default function AdminDashboard() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showThemeEditor, setShowThemeEditor] = useState(false);
 
   useEffect(() => {
     fetchAdminDefault();
@@ -22,37 +23,15 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-extrabold mb-2 text-indigo-700 tracking-tight">Art &amp; Craft</h1>
-      {/* Admin Default Theme Selector */}
-      <div className="mb-6 flex items-center gap-3">
-        <label className="font-medium">Default Theme for All Users:</label>
-        <select
-          value={adminDefault}
-          onChange={async e => {
-            setSaving(true);
-            await setAdminDefault(e.target.value as 'light' | 'dark' | 'system');
-            setSaving(false);
-          }}
-          className="rounded px-3 py-1 bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-700 text-sm shadow focus:outline-none"
-          aria-label="Set default theme"
-          disabled={saving}
-        >
-          <option value="system">System</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-        {saving && <span className="text-xs text-gray-500 ml-2">Saving...</span>}
-      </div>
-      {/* Custom Theme Editor Integration */}
-      <AdminThemeEditor />
+      
       <h2 className="text-2xl font-semibold mb-6">Dashboard</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         <Link
           to="/admin/gallery"
           className="p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-center">
-            <Image className="h-8 w-8 text-indigo-600" />
+            <Image className="h-8 w-10 text-indigo-600" />
             <div className="ml-4">
               <h2 className="text-lg font-medium">Manage Gallery</h2>
               <p className="text-gray-500">Add, edit, or remove artwork</p>
@@ -101,6 +80,24 @@ export default function AdminDashboard() {
             <p className="text-gray-500">View contact form messages</p>
           </div>
         </Link>
+        <div className="p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow flex items-center w-full text-left">
+          <MessageCircle className="h-8 w-8 text-indigo-600" />
+          <div className="ml-4 flex-1">
+            <h2 className="text-lg font-medium">Custom Theme</h2>
+            <p className="text-gray-500">Edit and apply a custom theme for the site</p>
+          </div>
+          <button
+            onClick={() => setShowThemeEditor(v => !v)}
+            className="ml-auto px-4 py-2 bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700 transition-colors"
+          >
+            {showThemeEditor ? 'Close' : 'Edit'}
+          </button>
+        </div>
+        {showThemeEditor && (
+          <div className="col-span-1 md:col-span-2">
+            <AdminThemeEditor />
+          </div>
+        )}
       </div>
       {isAboutOpen && (
         <AboutForm

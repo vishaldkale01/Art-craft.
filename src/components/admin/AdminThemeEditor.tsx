@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { getContrastYIQ } from '../utils/contrast';
+import { getContrastYIQ } from '../../utils/contrast';
+import { setThemeVariables } from '../../utils/theme';
 
 export default function AdminThemeEditor() {
   const [bg, setBg] = useState('#18181b');
@@ -16,6 +17,10 @@ export default function AdminThemeEditor() {
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
   };
+
+  // Default theme values for reset
+  const defaultBg = '#fff';
+  const defaultText = '#111';
 
   return (
     <div style={{ maxWidth: 400, margin: '2rem auto', padding: 24, background: '#f9f9f9', borderRadius: 12, boxShadow: '0 2px 8px #0001' }}>
@@ -43,6 +48,42 @@ export default function AdminThemeEditor() {
       </div>
       <div style={{ marginTop: 16, fontSize: 13, color: '#888' }}>
         The text color is auto-suggested for best contrast, but you can override it.
+      </div>
+      <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+        <button
+          style={{
+            padding: '10px 24px',
+            background: '#6366f1',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 6,
+            fontWeight: 600,
+            cursor: 'pointer',
+            fontSize: 16,
+          }}
+          onClick={() => setThemeVariables({ bg, text })}
+        >
+          Set Theme
+        </button>
+        <button
+          style={{
+            padding: '10px 24px',
+            background: '#e5e7eb',
+            color: '#111',
+            border: 'none',
+            borderRadius: 6,
+            fontWeight: 600,
+            cursor: 'pointer',
+            fontSize: 16,
+          }}
+          onClick={() => {
+            setBg(defaultBg);
+            setText(defaultText);
+            setThemeVariables({ bg: defaultBg, text: defaultText });
+          }}
+        >
+          Reset
+        </button>
       </div>
     </div>
   );
