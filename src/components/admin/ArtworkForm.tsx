@@ -28,6 +28,10 @@ export default function ArtworkForm({ artwork, onSubmit, onClose }: ArtworkFormP
     fetchCategories();
   }, [fetchCategories]);
 
+  useEffect(() => {
+    setFilePreview(artwork?.imageUrl || null);
+  }, [artwork]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);

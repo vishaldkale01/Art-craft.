@@ -10,13 +10,11 @@ interface AuthState {
 export const useAuth = create<AuthState>((set) => ({
   isAuthenticated: false,
   login: async (email: string, password: string) => {
-    // Check against Supabase users table (or fallback to static for now)
-    // Example: const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    // For now, fallback to static credentials
-    if (email === 'admin@example.com' && password === 'password123') {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (data?.user && !error) {
       set({ isAuthenticated: true });
     } else {
-      throw new Error('Invalid credentials');
+      throw new Error(error?.message || 'Invalid credentials');
     }
   },
   logout: () => set({ isAuthenticated: false }),

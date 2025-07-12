@@ -10,6 +10,7 @@ interface FormFieldProps {
   placeholder?: string;
   asDropdown?: boolean;
   options?: string[];
+  className?: string; // Allow custom className
 }
 
 export default function FormField({
@@ -24,6 +25,7 @@ export default function FormField({
   placeholder,
   asDropdown = false,
   options = [],
+  className = '', // Default to empty string
 }: FormFieldProps) {
   const commonProps = {
     id: name,
@@ -31,7 +33,7 @@ export default function FormField({
     value,
     onChange,
     required,
-    className: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
+    className: `mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${className}`,
     placeholder,
   };
 
