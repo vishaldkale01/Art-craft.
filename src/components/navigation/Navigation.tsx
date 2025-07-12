@@ -15,11 +15,11 @@ export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white dark:bg-gray-900 shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <NavLink to="/" className="text-2xl font-bold text-gray-900">
+            <NavLink to="/" className="text-2xl font-bold text-gray-900 dark:text-white">
             Art & Craft
             </NavLink>
           </div>

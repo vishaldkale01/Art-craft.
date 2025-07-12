@@ -1,3 +1,21 @@
+/* Add this to the top of your src/index.css for global theme variables */
+:root {
+  --bg: #fff;
+  --text: #111;
+  --border: #e5e7eb;
+  --accent: #6366f1;
+  --accent-text: #fff;
+  --muted-text: #888;
+  --error: #ef4444;
+  transition: background 0.2s, color 0.2s;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.2s, color 0.2s;
+}
+
+/* You can keep your Tailwind imports below */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

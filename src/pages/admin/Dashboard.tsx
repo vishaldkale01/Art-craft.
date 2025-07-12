@@ -1,20 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Image, FileText, User, Mail, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAbout } from '../../hooks/useAbout';
 import { useContact } from '../../hooks/useContact';
+import { useTheme } from '../../hooks/useTheme';
 import AboutForm from '../../components/admin/AboutForm';
 import ContactFormAdmin from '../../components/admin/ContactFormAdmin';
+import AdminThemeEditor from '../../components/admin/AdminThemeEditor';
 
 export default function AdminDashboard() {
   const { aboutText, education, exhibitions, imageUrl, setAbout } = useAbout();
   const { address, phone, email, studioHours, setContact } = useContact();
+  const { adminDefault, setAdminDefault, fetchAdminDefault } = useTheme();
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchAdminDefault();
+  }, []);
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
+      <h1 className="text-3xl font-extrabold mb-2 text-indigo-700 tracking-tight">Art &amp; Craft</h1>
+      {/* Admin Default Theme Selector */}
+      <div className="mb-6 flex items-center gap-3">
+        <label className="font-medium">Default Theme for All Users:</label>
+        <select
+          value={adminDefault}
+          onChange={async e => {
+            setSaving(true);
+            await setAdminDefault(e.target.value as 'light' | 'dark' | 'system');
+            setSaving(false);
+          }}
+          className="rounded px-3 py-1 bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-700 text-sm shadow focus:outline-none"
+          aria-label="Set default theme"
+          disabled={saving}
+        >
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        {saving && <span className="text-xs text-gray-500 ml-2">Saving...</span>}
+      </div>
+      {/* Custom Theme Editor Integration */}
+      <AdminThemeEditor />
+      <h2 className="text-2xl font-semibold mb-6">Dashboard</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Link
           to="/admin/gallery"

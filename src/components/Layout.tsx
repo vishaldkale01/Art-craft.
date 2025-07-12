@@ -7,7 +7,7 @@ export default function Layout() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-neutral-50 dark:bg-gray-950 transition-colors duration-300">
       {isAdmin ? <AdminNavigation /> : <Navigation />}
       <main>
         <Outlet />

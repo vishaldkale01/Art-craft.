@@ -6,20 +6,20 @@ export default function AdminNavigation() {
   const { logout } = useAuth();
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white dark:bg-gray-900 shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link to="/admin" className="flex items-center px-4 text-gray-900">
+            <Link to="/admin" className="flex items-center px-4 text-gray-900 dark:text-white">
               <LayoutDashboard className="h-6 w-6 mr-2" />
               Admin Panel
             </Link>
             <div className="hidden sm:flex sm:space-x-8 sm:ml-8">
-              <Link to="/admin/gallery" className="flex items-center px-3 text-gray-600 hover:text-gray-900">
+              <Link to="/admin/gallery" className="flex items-center px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                 <Image className="h-5 w-5 mr-2" />
                 Gallery
               </Link>
-              <Link to="/admin/blog" className="flex items-center px-3 text-gray-600 hover:text-gray-900">
+              <Link to="/admin/blog" className="flex items-center px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                 <FileText className="h-5 w-5 mr-2" />
                 Blog
               </Link>
@@ -27,7 +27,7 @@ export default function AdminNavigation() {
           </div>
           <button
             onClick={logout}
-            className="flex items-center px-4 text-gray-600 hover:text-gray-900"
+            className="flex items-center px-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           >
             <LogOut className="h-5 w-5 mr-2" />
             Logout
