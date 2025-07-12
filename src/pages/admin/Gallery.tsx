@@ -19,6 +19,9 @@ export default function AdminGallery() {
   const [showSelection, setShowSelection] = useState(false);
   const [confirmation, setConfirmation] = useState<{ type: 'delete' | 'update' | null, count: number }>({ type: null, count: 0 });
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [editingCategoryValue, setEditingCategoryValue] = useState('');
 
   useEffect(() => {
     fetchArtworks();
@@ -27,16 +30,16 @@ export default function AdminGallery() {
 
   // Main render
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Manage Gallery</h1>
+    <div className="min-h-screen bg-gray-50 pb-12">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Manage Gallery</h1>
         <div className="flex gap-2">
           <button
             onClick={() => {
               setEditingArtwork(null);
               setIsFormOpen(true);
             }}
-            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            className="flex items-center px-5 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-all duration-150 font-semibold"
           >
             <Plus className="h-5 w-5 mr-2" />
             Add Artwork
@@ -44,95 +47,105 @@ export default function AdminGallery() {
         </div>
       </div>
 
-      <BulkActions
-        selectedCount={selectedArtworks.length}
-        onBulkUpload={() => setIsBulkOpen(true)}
-        onBulkUpdate={() => {
-          if (selectedArtworks.length === 0) {
-            setShowSelection(true);
-            setToast({ message: 'Please select artworks to update.', type: 'error' });
-            setTimeout(() => setToast({ message: '', type: null }), 3000);
-            return;
-          }
-          setConfirmation({ type: 'update', count: selectedArtworks.length });
-        }}
-        onBulkDelete={() => {
-          if (selectedArtworks.length === 0) {
-            setShowSelection(true);
-            setToast({ message: 'Please select artworks to delete.', type: 'error' });
-            setTimeout(() => setToast({ message: '', type: null }), 3000);
-            return;
-          }
-          setConfirmation({ type: 'delete', count: selectedArtworks.length });
-        }}
-        disableBulkUpdate={false}
-        disableBulkDelete={false}
-      />
+      <div className="flex flex-wrap gap-3 items-stretch mb-8">
+        <BulkActions
+          selectedCount={selectedArtworks.length}
+          onBulkUpload={() => setIsBulkOpen(true)}
+          onBulkUpdate={() => {
+            if (selectedArtworks.length === 0) {
+              setShowSelection(true);
+              setToast({ message: 'Please select artworks to update.', type: 'error' });
+              setTimeout(() => setToast({ message: '', type: null }), 3000);
+              return;
+            }
+            setConfirmation({ type: 'update', count: selectedArtworks.length });
+          }}
+          onBulkDelete={() => {
+            if (selectedArtworks.length === 0) {
+              setShowSelection(true);
+              setToast({ message: 'Please select artworks to delete.', type: 'error' });
+              setTimeout(() => setToast({ message: '', type: null }), 3000);
+              return;
+            }
+            setConfirmation({ type: 'delete', count: selectedArtworks.length });
+          }}
+        />
+        <button
+          onClick={() => setIsCategoryModalOpen(true)}
+          className="px-5 py-2 rounded-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-150 h-full shadow"
+          style={{ minWidth: '150px' }}
+        >
+          Manage Categories
+        </button>
+      </div>
+
       {showSelection && (
         <div className="mb-4 flex gap-2">
           <button
             onClick={() => setSelectedArtworks(artworks.map(a => a.id))}
-            className="px-3 py-1 bg-gray-200 rounded text-sm"
+            className="px-4 py-1 bg-gray-200 rounded text-sm font-medium hover:bg-gray-300 transition"
           >
             Select All
           </button>
           <button
             onClick={() => setSelectedArtworks([])}
-            className="px-3 py-1 bg-gray-200 rounded text-sm"
+            className="px-4 py-1 bg-gray-200 rounded text-sm font-medium hover:bg-gray-300 transition"
           >
             Deselect All
           </button>
           <button
             onClick={() => { setShowSelection(false); setSelectedArtworks([]); setConfirmation({ type: null, count: 0 }); }}
-            className="px-3 py-1 bg-gray-300 rounded text-sm"
+            className="px-4 py-1 bg-gray-300 rounded text-sm font-medium hover:bg-gray-400 transition"
           >
             Cancel
           </button>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {artworks.map((artwork) => (
           <div
             key={artwork.id}
-            className={`bg-white rounded-lg shadow-sm overflow-hidden relative${showSelection ? ' pt-6' : ''}`}
+            className="bg-white rounded-xl shadow-md overflow-hidden relative group transition-all duration-200 hover:shadow-xl border border-gray-100"
           >
             {showSelection && (
-              <input
-                type="checkbox"
-                checked={selectedArtworks.includes(artwork.id)}
-                onChange={e => {
-                  setSelectedArtworks(prev =>
-                    e.target.checked
-                      ? [...prev, artwork.id]
-                      : prev.filter(id => id !== artwork.id)
-                  );
-                }}
-                className="absolute top-2 left-2 h-4 w-4 z-10"
-              />
+              <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 10 }}>
+                <input
+                  type="checkbox"
+                  checked={selectedArtworks.includes(artwork.id)}
+                  onChange={e => {
+                    setSelectedArtworks(prev =>
+                      e.target.checked
+                        ? [...prev, artwork.id]
+                        : prev.filter(id => id !== artwork.id)
+                    );
+                  }}
+                  className="h-5 w-5 accent-indigo-600 border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
             )}
             <img
               src={artwork.imageUrl}
               alt={artwork.title}
-              className="h-32 w-44 object-cover rounded mx-auto"
+              className="h-40 w-full object-cover rounded-t-xl transition group-hover:scale-105"
             />
-            <div className="p-4">
-              <h3 className="text-lg font-medium">{artwork.title}</h3>
-              <p className="text-gray-500">{artwork.category}</p>
+            <div className="p-5">
+              <h3 className="text-lg font-semibold text-gray-900 truncate">{artwork.title}</h3>
+              <p className="text-gray-500 text-sm mb-2">{artwork.category}</p>
               <div className="mt-4 flex space-x-4">
                 <button
                   onClick={() => {
                     setEditingArtwork(artwork);
                     setIsFormOpen(true);
                   }}
-                  className="flex items-center text-gray-600 hover:text-gray-900"
+                  className="flex items-center text-gray-600 hover:text-indigo-700 font-medium transition"
                 >
                   <Pencil className="h-4 w-4 mr-1" />
                   Edit
                 </button>
                 <button
                   onClick={() => deleteArtwork(artwork.id)}
-                  className="flex items-center text-red-600 hover:text-red-700"
+                  className="flex items-center text-red-600 hover:text-red-800 font-medium transition"
                 >
                   <Trash2 className="h-4 w-4 mr-1" />
                   Delete
@@ -143,45 +156,94 @@ export default function AdminGallery() {
         ))}
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold mb-2">Manage Categories</h2>
-        <div className="flex flex-wrap gap-2 mb-2">
-          {categories.map((cat) => (
-            <span key={cat} className="inline-flex items-center bg-gray-100 rounded px-3 py-1 text-sm font-medium">
-              {cat}
-              <button
-                onClick={() => deleteCategory(cat)}
-                className="ml-2 text-red-500 hover:text-red-700"
-                title="Delete category"
-                disabled={artworks.some(a => a.category === cat)}
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            if (newCategory.trim()) {
-              addCategory(newCategory.trim());
-              setNewCategory('');
-            }
-          }}
-          className="flex gap-2"
-        >
-          <input
-            type="text"
-            value={newCategory}
-            onChange={e => setNewCategory(e.target.value)}
-            placeholder="Add new category"
-            className="border rounded px-2 py-1 text-sm"
-          />
-          <button type="submit" className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">
-            Add
-          </button>
-        </form>
-      </div>
+      {isCategoryModalOpen && (
+        <Modal title="Manage Categories" onClose={() => setIsCategoryModalOpen(false)}>
+          <h2 className="text-lg font-semibold mb-2">Categories</h2>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {categories.map((cat) => (
+              <span key={cat} className="inline-flex items-center bg-gray-100 rounded px-3 py-1 text-sm font-medium">
+                {editingCategory === cat ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editingCategoryValue}
+                      onChange={e => setEditingCategoryValue(e.target.value)}
+                      className="border rounded px-2 py-1 text-sm mr-2"
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => {
+                        if (editingCategoryValue.trim() && editingCategoryValue !== cat) {
+                          // Update category logic
+                          const oldName = cat;
+                          const newName = editingCategoryValue.trim();
+                          // Remove old, add new
+                          deleteCategory(oldName);
+                          addCategory(newName);
+                        }
+                        setEditingCategory(null);
+                        setEditingCategoryValue('');
+                      }}
+                      className="text-green-600 hover:text-green-800 font-bold mr-1"
+                      title="Save"
+                    >
+                      ✓
+                    </button>
+                    <button
+                      onClick={() => { setEditingCategory(null); setEditingCategoryValue(''); }}
+                      className="text-gray-500 hover:text-gray-700 font-bold"
+                      title="Cancel"
+                    >
+                      ×
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {cat}
+                    <button
+                      onClick={() => { setEditingCategory(cat); setEditingCategoryValue(cat); }}
+                      className="ml-2 text-blue-500 hover:text-blue-700"
+                      title="Edit category"
+                      disabled={artworks.some(a => a.category === cat)}
+                    >
+                      ✎
+                    </button>
+                    <button
+                      onClick={() => deleteCategory(cat)}
+                      className="ml-2 text-red-500 hover:text-red-700"
+                      title="Delete category"
+                      disabled={artworks.some(a => a.category === cat)}
+                    >
+                      ×
+                    </button>
+                  </>
+                )}
+              </span>
+            ))}
+          </div>
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              if (newCategory.trim()) {
+                addCategory(newCategory.trim());
+                setNewCategory('');
+              }
+            }}
+            className="flex gap-2"
+          >
+            <input
+              type="text"
+              value={newCategory}
+              onChange={e => setNewCategory(e.target.value)}
+              placeholder="Add new category"
+              className="border rounded px-2 py-1 text-sm"
+            />
+            <button type="submit" className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">
+              Add
+            </button>
+          </form>
+        </Modal>
+      )}
 
       {isFormOpen && (
         <ArtworkForm
